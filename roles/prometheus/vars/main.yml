@@ -1,0 +1,6 @@
+user: prometheus
+group: prometheus
+node_exporter: node_exporter-0.18.1.linux-amd64
+home_dir: /usr/local/
+servertype: node_exporter
+prometheus: prometheus-2.11.1.linux-amd64

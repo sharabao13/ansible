@@ -1,0 +1,7 @@
+- name: install grafana pagkage
+  yum: name={{ rpm_dir }}/{{ grafana }}.rpm state=present
+
+- name: started grafana server
+  service: name=grafana-server state=started enabled=true
+
+

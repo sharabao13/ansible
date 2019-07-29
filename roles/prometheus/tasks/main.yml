@@ -1,0 +1,64 @@
+- name: Add group by prometheus
+  group: name={{ group }} state=present
+
+- name: Add user by prometheus
+  user: name={{ user }} state=present shell=/sbin/nologin
+
+- name: untar package by node_exporter
+  unarchive: src={{ node_exporter }}.tar.gz dest={{ home_dir }}
+  when: servertype == "node_exporter"
+
+- name: rename node_exporter
+  command: mv {{ home_dir }}/{{ node_exporter }}/ {{ home_dir }}/node_exporter/
+  when: servertype == "node_exporter"
+
+
+- name: modify node_exporter owner group
+  command: chown -R {{ user }}.{{ group }} {{ home_dir }}/node_exporter/
+  when: servertype == "node_exporter"
+
+
+- name: Sync node_exporter.service file
+  copy: src=node_exporter.service dest=/usr/lib/systemd/system/node_exporter.service
+  when: servertype == "node_exporter"
+
+
+- name: start node_exporter server
+  service: name=node_exporter state=started enabled=true
+  when: servertype == "node_exporter"
+
+
+- name: untar package by prometheus
+  unarchive: src={{ prometheus }}.tar.gz dest={{ home_dir }}
+  when: servertype == "prometheus"
+
+
+- name: rename prometheus
+  command: mv {{ home_dir }}/{{ prometheus }}/ {{ home_dir }}/prometheus/
+  when: servertype == "prometheus"
+
+
+- name: modify prometheus owner group
+  command: chown -R {{ user }}.{{ group }} {{ home_dir }}/prometheus/
+  when: servertype == "prometheus"
+
+
+- name: Sync prometheus.service file
+  copy: src=prometheus.service dest=/usr/lib/systemd/system/prometheus.service
+  when: servertype == "prometheus"
+
+
+- name: Create prometheus work dir
+  file: path=/var/lib/prometheus state=directory owner={{ user }} group={{ group }} 
+  when: servertype == "prometheus"
+
+
+- name: Sync prometheus.yml 
+  template: src=prometheus.yml.j2 dest={{ home_dir }}/prometheus/prometheus.yml owner={{ user }} group={{ group }}
+  notify: restart prometheus
+  when: servertype == "prometheus"
+  
+
+- name: start prometheus server
+  service: name=prometheus state=started enabled=true
+  when: servertype == "prometheus"

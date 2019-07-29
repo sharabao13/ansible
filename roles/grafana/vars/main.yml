@@ -1,0 +1,2 @@
+grafana: grafana-6.2.5-1.x86_64
+rpm_dir: /etc/ansible/roles/grafana/files/
