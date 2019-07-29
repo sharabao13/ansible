@@ -1,0 +1,10 @@
+- hosts: node_exporter
+  remote_user: root
+  roles:
+  - prometheus
+
+
+- hosts: prometheus
+  remote_user: root
+  roles:
+  - { role: prometheus, servertype: prometheus }
